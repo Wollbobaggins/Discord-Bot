@@ -2,9 +2,12 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using DiscordBotSurvivor.Commands;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
 using DSharpPlus.EventArgs;
+using DSharpPlus.Interactivity;
+using DSharpPlus.Interactivity.Extensions;
 using Newtonsoft.Json;
 
 namespace DiscordBotSurvivor
@@ -15,6 +18,7 @@ namespace DiscordBotSurvivor
         #region Properties
 
         public DiscordClient Client { get; private set; }
+        public InteractivityExtension Interactivity { get; private set; }
         public CommandsNextExtension Commands { get; private set; }
 
         #endregion
@@ -34,7 +38,7 @@ namespace DiscordBotSurvivor
 
             JsonConfig jsonConfig = JsonConvert.DeserializeObject<JsonConfig>(json);
 
-            DiscordConfiguration config = new DiscordConfiguration
+            DiscordConfiguration discordConfig = new DiscordConfiguration
             {
                 Token = jsonConfig.Token,
                 TokenType = TokenType.Bot,
@@ -43,18 +47,17 @@ namespace DiscordBotSurvivor
                 // UseInternalLogHandler = true // HACK: this param isn't available anymore
             };
 
-            Client = new DiscordClient(config);
+            Client = new DiscordClient(discordConfig);
 
             Client.Ready += OnClientReady;
 
-            CommandsNextConfiguration commandConfig = new CommandsNextConfiguration
+            Client.UseInteractivity(new InteractivityConfiguration
             {
-                StringPrefixes = new string[] { jsonConfig.Prefix },
-                EnableDms = false,
-                EnableMentionPrefix = true
-            };
+                Timeout = TimeSpan.FromMinutes(1)
+            });
 
-            Commands = Client.UseCommandsNext(commandConfig);
+
+            RegisterCommands(jsonConfig);
 
             await Client.ConnectAsync();
 
@@ -65,6 +68,21 @@ namespace DiscordBotSurvivor
         private Task OnClientReady(DiscordClient c, ReadyEventArgs e)
         {
             return Task.CompletedTask;
+        }
+
+        private void RegisterCommands(JsonConfig jsonConfig)
+        {
+            CommandsNextConfiguration commandConfig = new CommandsNextConfiguration
+            {
+                StringPrefixes = new string[] { jsonConfig.Prefix },
+                //EnableDms = false,
+                EnableMentionPrefix = true,
+                DmHelp = true
+            };
+
+            Commands = Client.UseCommandsNext(commandConfig);
+
+            Commands.RegisterCommands<DebugCommands>();
         }
 
         #endregion
