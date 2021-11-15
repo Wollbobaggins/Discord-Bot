@@ -11,6 +11,29 @@ namespace DiscordBotSurvivor.Commands
 {
     public class JeffCommands : BaseCommandModule
     {
+        [Command("startgame")]
+        public async Task StartGame(CommandContext context)
+        {
+            // starts the game and initializes conditions
+
+            // create table using the list of players
+
+            // randomizes players into two teams
+            await context.Channel.SendMessageAsync("asda").ConfigureAwait(false);
+        }
+
+        [Command("endgame")]
+        public async Task EndGame(CommandContext context)
+        {
+            // NOTE: might not be necessary, since the jury command can also activate it
+
+            // reset all, drop table
+
+            // clear all roles in discord and set to survivor, keep the winner role?
+
+            await context.Channel.SendMessageAsync("asda").ConfigureAwait(false);
+        }
+
         [Command("data")]
         public async Task Data(CommandContext context)
         {
