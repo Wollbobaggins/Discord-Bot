@@ -120,6 +120,8 @@
     <Compile Include="Bot.cs" />
     <Compile Include="JsonConfig.cs" />
     <Compile Include="Commands\DebugCommands.cs" />
+    <Compile Include="Commands\RandomCommands.cs" />
+    <Compile Include="Commands\JeffCommands.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

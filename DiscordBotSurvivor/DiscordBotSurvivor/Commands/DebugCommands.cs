@@ -128,18 +128,35 @@ namespace DiscordBotSurvivor.Commands
 
 
         [Command("messagerole")]
-        public async Task MessageRole(CommandContext context)
+        public async Task MessageRole(CommandContext context, DiscordRole role)
         {
-            var interactivity = context.Client.GetInteractivity();
-
-            var role = context.Guild.GetRole(909331568881983538);
-
-            await context.Member.SendMessageAsync("asdasd").ConfigureAwait(false);
-
+            bool hasSentMessage = false;
             foreach (var member in context.Guild.Members)
             {
-                // 
+                if (member.Value.Roles.Contains(role))
+                {
+                    var message = await member.Value.SendMessageAsync("asdasd").ConfigureAwait(false);
+
+                    hasSentMessage = true;
+                }
             }
+
+            if (!hasSentMessage) return;
+
+            //await Task.Delay(-1);
+        }
+
+        [Command("toggle")]
+        public async Task Toggle(CommandContext context)
+        {
+            Bot.Singleton.HasGameStart = !Bot.Singleton.HasGameStart;
+            await context.Channel.SendMessageAsync($"HasGameStart: { Bot.Singleton.HasGameStart}").ConfigureAwait(false);
+        }
+
+        [Command("prompt")]
+        public async Task Prompt(CommandContext context, string prompt)
+        {
+            await context.Channel.SendMessageAsync(prompt).ConfigureAwait(false);
         }
     }
 }
