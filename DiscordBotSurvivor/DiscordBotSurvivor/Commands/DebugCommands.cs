@@ -6,6 +6,7 @@ using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
+using System.IO;
 
 namespace DiscordBotSurvivor.Commands
 {
@@ -146,17 +147,43 @@ namespace DiscordBotSurvivor.Commands
             //await Task.Delay(-1);
         }
 
-        [Command("toggle")]
-        public async Task Toggle(CommandContext context)
+        [Command("debugtoggle")]
+        public async Task DebugToggle(CommandContext context)
         {
-            Bot.Singleton.HasGameStart = !Bot.Singleton.HasGameStart;
-            await context.Channel.SendMessageAsync($"HasGameStart: { Bot.Singleton.HasGameStart}").ConfigureAwait(false);
+            Bot.Singleton.HasGameStarted = !Bot.Singleton.HasGameStarted;
+            await context.Channel.SendMessageAsync($"HasGameStart: { Bot.Singleton.HasGameStarted}").ConfigureAwait(false);
         }
 
         [Command("prompt")]
         public async Task Prompt(CommandContext context, string prompt)
         {
             await context.Channel.SendMessageAsync(prompt).ConfigureAwait(false);
+        }
+
+        [Command("write")]
+        public async Task Write(CommandContext context, string prompt)
+        {
+            FileStream stream = File.OpenWrite("game.state");
+            BinaryWriter writer = new BinaryWriter(stream);
+
+            await context.Channel.SendMessageAsync(prompt).ConfigureAwait(false);
+
+            writer.Write(prompt);
+
+            stream.Close();
+            writer.Close();
+        }
+
+        [Command("read")]
+        public async Task Read(CommandContext context)
+        {
+            FileStream stream = File.OpenRead("game.state");
+            BinaryReader reader = new BinaryReader(stream);
+
+            await context.Channel.SendMessageAsync(reader.ReadString()).ConfigureAwait(false);
+
+            stream.Close();
+            reader.Close();
         }
     }
 }

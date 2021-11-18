@@ -122,6 +122,7 @@
     <Compile Include="Commands\DebugCommands.cs" />
     <Compile Include="Commands\RandomCommands.cs" />
     <Compile Include="Commands\JeffCommands.cs" />
+    <Compile Include="Commands\SurvivorCommands.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

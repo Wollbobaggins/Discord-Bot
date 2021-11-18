@@ -11,47 +11,40 @@ namespace DiscordBotSurvivor.Commands
 {
     public class JeffCommands : BaseCommandModule
     {
-        [Command("startgame")]
-        public async Task StartGame(CommandContext context)
+        [Command("toggle")]
+        public async Task Toggle(CommandContext context)
         {
-            // starts the game and initializes conditions
-
-            // create table using the list of players
-
-            // randomizes players into two teams
-            await context.Channel.SendMessageAsync("asda").ConfigureAwait(false);
+            Bot.Singleton.HasGameStarted = !Bot.Singleton.HasGameStarted;
+            string message = $"HasGameStart: { Bot.Singleton.HasGameStarted}";
+            await context.Channel.SendMessageAsync(message).ConfigureAwait(false);
         }
 
-        [Command("endgame")]
-        public async Task EndGame(CommandContext context)
+        [Command("interviewstart")]
+        public async Task StartInterview(CommandContext context, string prompt)
         {
-            // NOTE: might not be necessary, since the jury command can also activate it
+            Bot.Singleton.IsInterviewing = true;
+            DiscordRole role = context.Guild.GetRole(909331568881983538);
+            string helpMessage = "To respond to the interview message, reply with !r \"YOUR MESSAGE \"\n\n";
+            helpMessage += "for example: :point_right:!r \"my name is jeff\":point_left:";
 
-            // reset all, drop table
+            foreach (var member in context.Guild.Members)
+            {
+                if (member.Value.Roles.Contains(role))
+                {
+                    await member.Value.SendMessageAsync(prompt).ConfigureAwait(false);
 
-            // clear all roles in discord and set to survivor, keep the winner role?
-
-            await context.Channel.SendMessageAsync("asda").ConfigureAwait(false);
+                    await member.Value.SendMessageAsync(helpMessage).ConfigureAwait(false);
+                }
+            }
         }
 
-        [Command("data")]
-        public async Task Data(CommandContext context)
+        [Command("interviewend")]
+        public async Task EndInterview(CommandContext context)
         {
-            // logs all data to discord
-            await context.Channel.SendMessageAsync("asda").ConfigureAwait(false);
-        }
+            // TODO: alert user of their selected response or that they did not send message
 
-        [Command("interview")]
-        public async Task Interview(CommandContext context, string prompt)
-        {
-            // for every survivor
-                // send them a DM about prompt
-                // record the response SOMEHOW??? in a dictionary
-                    // if the user sends multi responses, record more? or delete prev response
-
-            // later broadcast the responses in the interview channel (this might require another role, crew?)
-            
-            await context.Channel.SendMessageAsync("x").ConfigureAwait(false);
+            Bot.Singleton.IsInterviewing = false;
+            await Task.CompletedTask;
         }
 
         [Command("jury")]
@@ -62,7 +55,7 @@ namespace DiscordBotSurvivor.Commands
                 // send them a DM asking about which player (in toKickRole) to kick
                 // if the user sends multi responses, record last
 
-            // after time period, kick player who was voted out
+            // after time period, kick player who was voted out and give him loser role
             // then report voting results to the interview channel
 
             await context.Channel.SendMessageAsync("x").ConfigureAwait(false);

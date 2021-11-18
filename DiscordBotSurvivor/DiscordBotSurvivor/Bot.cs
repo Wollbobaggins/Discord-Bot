@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DiscordBotSurvivor.Commands;
 using DSharpPlus;
 using DSharpPlus.CommandsNext;
+using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using DSharpPlus.Interactivity;
 using DSharpPlus.Interactivity.Extensions;
@@ -22,7 +23,8 @@ namespace DiscordBotSurvivor
         public CommandsNextExtension Commands { get; private set; }
 
         public static Bot Singleton { get; private set; }
-        public bool HasGameStart { get; set; }
+        public bool HasGameStarted { get; set; }
+        public bool IsInterviewing { get; set; }
 
         #endregion
         /************************************************************/
@@ -97,8 +99,10 @@ namespace DiscordBotSurvivor
 
             Commands = Client.UseCommandsNext(commandConfig);
 
-            Commands.RegisterCommands<DebugCommands>();
-            //Commands.RegisterCommands<JeffCommands>();
+            //Commands.RegisterCommands<DebugCommands>();
+            Commands.RegisterCommands<RandomCommands>();
+            Commands.RegisterCommands<JeffCommands>();
+            Commands.RegisterCommands<SurvivorCommands>();
         }
 
         #region Event Handler Functions
@@ -112,9 +116,9 @@ namespace DiscordBotSurvivor
         private async Task OnGuildMemberAdded(DiscordClient c, GuildMemberAddEventArgs args)
         {
             string message = $"Welcome, {args.Member.DisplayName}. ";
-            DSharpPlus.Entities.DiscordRole role;
+            DiscordRole role;
 
-            if (HasGameStart)
+            if (HasGameStarted)
             {
                 role = args.Guild.GetRole(909675969344831529);
                 message += "The game has already started, you are assigned the role Loser :cry:";
